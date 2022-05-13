@@ -184,22 +184,26 @@ FROM
 ```sql
 WITH increasing_employee_and_avg_salary 
 	(
-	 employee_firstname,
-	 employee_lastname,
-	 employee_start_date,
-	 employee_by_department, 
-	 avg_salary_by_department, 
-	 cumulative_salary
+		department_id,
+		employee_firstname,
+		employee_lastname,
+		employee_start_date,
+		employee_salary,
+		employee_by_department, 
+		avg_salary_by_department, 
+		cumulative_salary
 	 ) 
 	 AS 
 	 (
 		SELECT
+			employees.department_id,
 			employees.first_name,
 			employees.last_name,
 			employees.start_date,
+			employees.salary,
 			COUNT(*) OVER (PARTITION BY department_id ORDER BY start_date) AS employee_by_department,
 			AVG(salary) OVER (PARTITION BY department_id ORDER BY start_date) AS avg_salary_by_department,
-			SUM(salary) OVER (ORDER BY start_date) AS cumulative_salary
+			SUM(salary) OVER (PARTITION BY department_id ORDER BY start_date) AS cumulative_salary
 		FROM 
 			employees
 		ORDER BY
@@ -208,10 +212,12 @@ WITH increasing_employee_and_avg_salary
 	)
 
 SELECT
+department_id,
 	employee_firstname,
-	 employee_lastname,
-	 employee_start_date,
-	 employee_by_department, 
+	employee_lastname,
+	employee_start_date,
+	employee_salary,
+	employee_by_department AS employee_count_by_department, 
 	ROUND(avg_salary_by_department, 2) AS changing_avg_salart_by_department,
 	cumulative_salary
 FROM
