@@ -139,6 +139,7 @@ ORDER BY
 2) Determine if any employees started on the same day (hint: some sort of ranking may be useful here)
 
 ```sql
+-- Using COUNT
 SELECT
 	COUNT(employees.id) AS count,
 	start_date
@@ -148,11 +149,20 @@ GROUP BY
 	start_date
 ORDER BY 
 	count DESC;
+
+-- Using DENSE_RANK
+SELECT
+	start_date,
+	DENSE_RANK() OVER (ORDER BY start_date)
+FROM
+	employees
+ORDER BY start_date DESC;
 ```
 
 3) Find how many employees there are from each country
 
 ```sql
+-- Using COUNT
 SELECT
 	COUNT(id) AS count,
 	country
@@ -160,6 +170,13 @@ FROM
 	employees
 GROUP BY
 	country;
+
+-- Using COUNT [window]
+SELECT 
+	DISTINCT (country),
+	COUNT(*) OVER (PARTITION BY country)
+FROM
+	employees
 ```
 
 4) Show how the average salary cost for each department has changed as the number of employees has increased
